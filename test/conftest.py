@@ -3,7 +3,7 @@ import pytest
 from selene import browser
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def browser_management():
     # Браузер и базовый URL
     browser.config.base_url = 'https://demoqa.com'

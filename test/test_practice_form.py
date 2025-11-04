@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from selene import browser, by, have
+from selene import browser, by, have, command
 
 
 def test_fill_form():
-    browser.open('https://demoqa.com/automation-practice-form')
+    browser.open('/automation-practice-form')
 
     # Заполняю поля
     browser.element('#firstName').type('Daria')
@@ -26,14 +26,14 @@ def test_fill_form():
     browser.element('#hobbiesWrapper').element(by.text('Reading')).click()
 
     # Загрузка картинки
-    picture_path = str(Path(__file__).parent.joinpath('resources', 'avatar.png').resolve())
+    picture_path = str(Path(__file__).parent.parent.joinpath('resources', 'avatar.png').resolve())
     browser.element('#uploadPicture').set_value(picture_path)
 
     # Адрес
     browser.element('#currentAddress').type('Amsterdam, Keizersgracht 123')
 
     # State / City — это react-select
-    browser.element('#state').click()
+    browser.element('#state').perform(command.js.scroll_into_view).click()
     browser.element('#react-select-3-input').type('NCR').press_enter()
     browser.element('#city').click()
     browser.element('#react-select-4-input').type('Delhi').press_enter()
@@ -47,13 +47,15 @@ def test_fill_form():
     )
 
     # Таблица с результатами содержит наши значения
-    results = browser.element('.table-responsive')
-    results.should(have.text('Daria Tester'))
-    results.should(have.text('daria.tester@example.com'))
-    results.should(have.text('Female'))
-    results.should(have.text('9001234567'))
-    results.should(have.text('03 November,1995'))
-    results.should(have.text('Maths'))  # сайт отображает "Maths"
-    results.should(have.text('Reading'))
-    results.should(have.text('Amsterdam, Keizersgracht 123'))
-    results.should(have.text('NCR Delhi'))
+    browser.all('.modal-content table tbody tr td:nth-child(2)').should(have.exact_texts(
+        'Daria Tester',
+        'daria.tester@example.com',
+        'Female',
+        '9001234567',
+        '03 November,1995',
+        'Maths',
+        'Reading',
+        'avatar.png',
+        'Amsterdam, Keizersgracht 123',
+        'NCR Delhi'
+    ))
